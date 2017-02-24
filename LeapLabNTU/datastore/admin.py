@@ -1,0 +1,33 @@
+from django.contrib import admin
+from .models import Language, Mother, Father, Baby, LanguagesKnownByFatherInOrderOfFluency, LanguagesKnownByMotherInOrderOfFluency, \
+LanguageProficiencyOfMothersInSpeaking, LanguageProficiencyOfMothersInUnderstanding, LanguageProficiencyOfMothersInWriting,\
+LanguageProficiencyOfMothersInReading, LanguageProficiencyOfFathersInSpeaking, LanguageProficiencyOfFathersInUnderstanding,\
+LanguageProficiencyOfFathersInWriting, LanguageProficiencyOfFathersInReading, LanguageSpokenToBabyByMother,\
+LanguageSpokenToBabyByFather, LanguageSpokenToBabyBySiblings, LanguageSpokenToBabyByMaternalGrandparents,\
+LanguageSpokenToBabyByPaternalGrandparents, LanguageSpokenToBabyByRelatives, LanguageSpokenToBabyByOtherCaregivers,\
+LanguageSpokenToBabyInSchool, Session, Study
+
+admin.site.register(Language)
+admin.site.register(Mother)
+admin.site.register(Father)
+admin.site.register(Baby)
+admin.site.register(LanguagesKnownByFatherInOrderOfFluency)
+admin.site.register(LanguagesKnownByMotherInOrderOfFluency)
+admin.site.register(LanguageProficiencyOfMothersInSpeaking)
+admin.site.register(LanguageProficiencyOfMothersInUnderstanding)
+admin.site.register(LanguageProficiencyOfMothersInWriting)
+admin.site.register(LanguageProficiencyOfMothersInReading)
+admin.site.register(LanguageProficiencyOfFathersInSpeaking)
+admin.site.register(LanguageProficiencyOfFathersInUnderstanding)
+admin.site.register(LanguageProficiencyOfFathersInWriting)
+admin.site.register(LanguageProficiencyOfFathersInReading)
+admin.site.register(LanguageSpokenToBabyByMother)
+admin.site.register(LanguageSpokenToBabyByFather)
+admin.site.register(LanguageSpokenToBabyBySiblings)
+admin.site.register(LanguageSpokenToBabyByMaternalGrandparents)
+admin.site.register(LanguageSpokenToBabyByPaternalGrandparents)
+admin.site.register(LanguageSpokenToBabyByRelatives)
+admin.site.register(LanguageSpokenToBabyByOtherCaregivers)
+admin.site.register(LanguageSpokenToBabyInSchool)
+admin.site.register(Session)
+admin.site.register(Study)
