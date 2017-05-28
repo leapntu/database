@@ -49,11 +49,15 @@ class Father(Parent):
 			return "Father of " + babies[0].first_name + " " + babies[0].last_name
 
 class LanguagesKnownByFatherInOrderOfFluency(models.Model):
+	def __str__(self):
+		return str(self.father) + " - " + str(self.language) + " - " + str(self.order)
 	father = models.ForeignKey(Father)
 	language = models.ForeignKey(Language)
 	order = models.PositiveSmallIntegerField()
 
 class LanguagesKnownByMotherInOrderOfFluency(models.Model):
+	def __str__(self):
+		return str(self.mother) + " - " + str(self.language) + " - " + str(self.order)
 	mother = models.ForeignKey(Mother)
 	language = models.ForeignKey(Language)
 	order = models.PositiveSmallIntegerField()
