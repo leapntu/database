@@ -13,6 +13,11 @@ class PercentField(models.FloatField):
         MaxValueValidator(100),
     ]
 
+class Occupation(models.Model):
+	def __str__(self):
+		return self.name
+	name = models.TextField()
+
 class Person(models.Model):
 	last_modified = models.DateTimeField(auto_now = True)
 	created_at = models.DateTimeField(auto_now_add = True)
@@ -22,7 +27,7 @@ class Parent(Person):
 	date_of_migration_to_singapore = models.DateField(blank = True, null = True)
 	languages_spoken_while_growing_up = models.ManyToManyField('Language', related_name = 'parent', blank = True)
 	education = models.TextField(blank = True, null = True)
-	occupation = models.TextField(blank = True, null = True)
+	occupation = models.ForeignKey(Occupation, null = True, blank = True)
 	email_address = models.EmailField(blank = True, null = True)
 	contact_number = PhoneNumberField(blank = True, null = True)
 	home_address = AddressField(blank = True, null = True)

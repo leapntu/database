@@ -5,11 +5,12 @@ LanguageProficiencyOfMothersInReading, LanguageProficiencyOfFathersInSpeaking, L
 LanguageProficiencyOfFathersInWriting, LanguageProficiencyOfFathersInReading, LanguageSpokenToBabyByMother,\
 LanguageSpokenToBabyByFather, LanguageSpokenToBabyBySiblings, LanguageSpokenToBabyByMaternalGrandparents,\
 LanguageSpokenToBabyByPaternalGrandparents, LanguageSpokenToBabyByRelatives, LanguageSpokenToBabyByOtherCaregivers,\
-LanguageSpokenToBabyInSchool, Session, Study
+LanguageSpokenToBabyInSchool, Session, Study, Occupation
 
 admin.site.register(Language)
 admin.site.register(Session)
 admin.site.register(Study)
+admin.site.register(Occupation)
 
 class LanguagesKnownByFatherInOrderOfFluencyInline(admin.TabularInline):
 	def get_extra(self, request, obj, **kwargs):
