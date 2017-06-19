@@ -4,60 +4,62 @@ LanguageProficiencyOfMothersInSpeaking, LanguageProficiencyOfMothersInUnderstand
 LanguageProficiencyOfMothersInReading, LanguageProficiencyOfFathersInSpeaking, LanguageProficiencyOfFathersInUnderstanding,\
 LanguageProficiencyOfFathersInWriting, LanguageProficiencyOfFathersInReading, Session, Study, Occupation, BabyLanguageProfile, \
 LanguageSpokenToBabyByMother, LanguageSpokenToBabyByFather, LanguageSpokenToBabyBySiblings, LanguageSpokenToBabyByMaternalGrandparents, \
-LanguageSpokenToBabyByPaternalGrandparents, LanguageSpokenToBabyByRelatives, LanguageSpokenToBabyByOtherCaregivers, LanguageSpokenToBabyInSchool
+LanguageSpokenToBabyByPaternalGrandparents, LanguageSpokenToBabyByRelatives, LanguageSpokenToBabyByOtherCaregivers, LanguageSpokenToBabyInSchool, \
+Household, HouseholdMember
 import nested_admin
 
 admin.site.register(Language)
 admin.site.register(Session)
 admin.site.register(Study)
 admin.site.register(Occupation)
+admin.site.register(HouseholdMember)
 
-class LanguagesKnownByFatherInOrderOfFluencyInline(admin.TabularInline):
+class LanguagesKnownByFatherInOrderOfFluencyInline(nested_admin.NestedStackedInline):
 	def get_extra(self, request, obj, **kwargs):
 		return 0
 	model = LanguagesKnownByFatherInOrderOfFluency
 
-class LanguagesKnownByMotherInOrderOfFluencyInline(admin.TabularInline):
+class LanguagesKnownByMotherInOrderOfFluencyInline(nested_admin.NestedStackedInline):
 	def get_extra(self, request, obj, **kwargs):
 		return 0
 	model = LanguagesKnownByMotherInOrderOfFluency
 
-class LanguageProficiencyOfMothersInSpeakingInline(admin.TabularInline):
+class LanguageProficiencyOfMothersInSpeakingInline(nested_admin.NestedStackedInline):
 	def get_extra(self, request, obj, **kwargs):
 		return 0
 	model = LanguageProficiencyOfMothersInSpeaking
 
-class LanguageProficiencyOfMothersInUnderstandingInline(admin.TabularInline):
+class LanguageProficiencyOfMothersInUnderstandingInline(nested_admin.NestedStackedInline):
 	def get_extra(self, request, obj, **kwargs):
 		return 0
 	model = LanguageProficiencyOfMothersInUnderstanding
 
-class LanguageProficiencyOfMothersInWritingInline(admin.TabularInline):
+class LanguageProficiencyOfMothersInWritingInline(nested_admin.NestedStackedInline):
 	def get_extra(self, request, obj, **kwargs):
 		return 0
 	model = LanguageProficiencyOfMothersInWriting
 
-class LanguageProficiencyOfMothersInReadingInline(admin.TabularInline):
+class LanguageProficiencyOfMothersInReadingInline(nested_admin.NestedStackedInline):
 	def get_extra(self, request, obj, **kwargs):
 		return 0
 	model = LanguageProficiencyOfMothersInReading
 
-class LanguageProficiencyOfFathersInSpeakingInline(admin.TabularInline):
+class LanguageProficiencyOfFathersInSpeakingInline(nested_admin.NestedStackedInline):
 	def get_extra(self, request, obj, **kwargs):
 		return 0
 	model = LanguageProficiencyOfFathersInSpeaking
 
-class LanguageProficiencyOfFathersInUnderstandingInline(admin.TabularInline):
+class LanguageProficiencyOfFathersInUnderstandingInline(nested_admin.NestedStackedInline):
 	def get_extra(self, request, obj, **kwargs):
 		return 0
 	model = LanguageProficiencyOfFathersInUnderstanding
 
-class LanguageProficiencyOfFathersInWritingInline(admin.TabularInline):
+class LanguageProficiencyOfFathersInWritingInline(nested_admin.NestedStackedInline):
 	def get_extra(self, request, obj, **kwargs):
 		return 0
 	model = LanguageProficiencyOfFathersInWriting
 
-class LanguageProficiencyOfFathersInReadingInline(admin.TabularInline):
+class LanguageProficiencyOfFathersInReadingInline(nested_admin.NestedStackedInline):
 	def get_extra(self, request, obj, **kwargs):
 		return 0
 	model = LanguageProficiencyOfFathersInReading
@@ -155,7 +157,53 @@ class BabyLanguageProfileAdmin(nested_admin.NestedModelAdmin):
 	]
 	readonly_fields = ('last_modified', 'created_at', )
 
+class BabyInline(nested_admin.NestedStackedInline):
+	model = Baby
+	inlines = [
+		BabyLanguageProfileInline,
+	]
+	def get_extra(self, request, obj, **kwargs):
+		return 0
+
+class FatherInline(nested_admin.NestedStackedInline):
+	model = Father
+	def get_extra(self, request, obj, **kwargs):
+		return 0
+	inlines = [
+		LanguagesKnownByFatherInOrderOfFluencyInline,
+		LanguageProficiencyOfFathersInSpeakingInline,
+		LanguageProficiencyOfFathersInUnderstandingInline,
+		LanguageProficiencyOfFathersInWritingInline,
+		LanguageProficiencyOfFathersInReadingInline,
+	]
+
+class MotherInline(nested_admin.NestedStackedInline):
+	model = Mother
+	def get_extra(self, request, obj, **kwargs):
+		return 0
+	inlines = [
+		LanguagesKnownByMotherInOrderOfFluencyInline,
+		LanguageProficiencyOfMothersInSpeakingInline,
+		LanguageProficiencyOfMothersInUnderstandingInline,
+		LanguageProficiencyOfMothersInWritingInline,
+		LanguageProficiencyOfMothersInReadingInline,
+	]
+
+class HouseholdMemberInline(nested_admin.NestedStackedInline):
+	model = HouseholdMember
+	def get_extra(self, request, obj, **kwargs):
+		return 0
+
+class HouseholdAdmin(nested_admin.NestedModelAdmin):
+	inlines = [
+		BabyInline,
+		FatherInline,
+		MotherInline,
+		HouseholdMemberInline,
+	]
+
 admin.site.register(BabyLanguageProfile, BabyLanguageProfileAdmin)
 admin.site.register(Father, FatherAdmin)
 admin.site.register(Mother, MotherAdmin)
 admin.site.register(Baby, BabyAdmin)
+admin.site.register(Household, HouseholdAdmin)

@@ -51,7 +51,6 @@ class Parent(Person):
 	occupation = models.ForeignKey(Occupation, null = True, blank = True)
 	email_address = models.EmailField(blank = True, null = True)
 	contact_number = PhoneNumberField(blank = True, null = True)
-	home_address = AddressField(blank = True, null = True)
 
 class Language(models.Model):
 	def __str__(self):
@@ -60,19 +59,27 @@ class Language(models.Model):
 
 class Mother(Parent):
 	def __str__(self):
+		if self.name:
+			return self.name
 		babies = Baby.objects.filter(mother__pk = self.pk)
 		if not babies.count():
 			return 'Mother without any assigned baby'
 		else:
 			return "Mother of " + babies[0].first_name + (" " + babies[0].last_name if babies[0].last_name else "")
+	household = models.ForeignKey('Household', related_name = 'mothers', blank = True, null = True)
+	name = models.TextField(blank = True, null = True)
 
 class Father(Parent):
 	def __str__(self):
+		if self.name:
+			return self.name
 		babies = Baby.objects.filter(father__pk = self.pk)
 		if not babies.count():
 			return 'Father without any assigned baby'
 		else:
 			return "Father of " + babies[0].first_name + (" " + babies[0].last_name if babies[0].last_name else "")
+	household = models.ForeignKey('Household', related_name = 'fathers', blank = True, null = True)
+	name = models.TextField(blank = True, null = True)
 
 class LanguagesKnownByFatherInOrderOfFluency(models.Model):
 	def __str__(self):
@@ -97,7 +104,7 @@ class Baby(Person):
 		return self.first_name + " " + (self.last_name if self.last_name else "")
 	first_name = models.CharField(max_length = 35)
 	last_name = models.CharField(max_length = 35, blank = True, null = True)
-	date_of_birth = models.DateField()
+	date_of_birth = models.DateField(blank = True, null = True)
 	has_sight_difficulties = models.NullBooleanField(blank = True, null = True)
 	has_hearing_difficulties = models.NullBooleanField(blank = True, null = True)
 	father = models.ForeignKey(Father, related_name = 'baby', blank = True, null = True)
@@ -107,6 +114,9 @@ class Baby(Person):
 	def save(self, *args, **kwargs):
 		slug_save(self)
 		super().save(*args, **kwargs)
+	household = models.ForeignKey('Household', related_name = 'babies', blank = True, null = True)
+	due_date = models.DateField(blank = True, null = True)
+	medical_history_notes = models.TextField(blank = True, null = True)
 
 class BabyLanguageProfile(DateTimeKeeperModel):
 	def __str__(self):
@@ -287,3 +297,27 @@ class Study(models.Model):
 	study = models.CharField(max_length = 20, choices = CHOICE_STUDY)
 	session = models.ForeignKey(Session)
 	recording = models.FileField(blank = True, null = True)
+
+class Household(models.Model):
+	def __str__(self):
+		baby_occupants_string_representation = ', '.join([str(baby) for baby in self.babies.all()])
+		father_occupants_string_representation = ', '.join([str(father) for father in self.fathers.all()])
+		mother_occupants_string_representation = ', '.join([str(mother) for mother in self.mothers.all()])
+		household_members_string_representation = ', '.join([str(household_member) for household_member in self.members.all()])
+		return (', '.join(
+			([baby_occupants_string_representation] if baby_occupants_string_representation else [])
+			+ ([father_occupants_string_representation] if father_occupants_string_representation else [])
+			+ ([mother_occupants_string_representation] if mother_occupants_string_representation else [])
+			+ ([household_members_string_representation] if household_members_string_representation else [])
+		))
+	address = AddressField(blank = True, null = True)
+	house_phone = PhoneNumberField(blank = True, null = True)
+	notes = models.TextField(blank = True, null = True)
+
+class HouseholdMember(models.Model):
+	def __str__(self):
+		return self.relationship_with_baby
+	relationship_with_baby = models.TextField()
+	email_address = models.EmailField(blank = True, null = True)
+	contact_number = PhoneNumberField(blank = True, null = True)
+	household = models.ForeignKey(Household, related_name = 'members', blank = True, null = True)
