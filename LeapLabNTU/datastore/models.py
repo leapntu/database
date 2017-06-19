@@ -3,6 +3,8 @@ from django_countries.fields import CountryField
 from phonenumber_field.modelfields import PhoneNumberField
 from address.models import AddressField
 from django.core.validators import MinValueValidator, MaxValueValidator
+import datetime
+import django
 
 class PercentField(models.FloatField):
     """
@@ -12,6 +14,13 @@ class PercentField(models.FloatField):
         MinValueValidator(0),
         MaxValueValidator(100),
     ]
+
+class DateTimeKeeperModel(models.Model):
+	class Meta:
+		abstract = True
+	last_modified = models.DateTimeField(auto_now = True)
+	created_at = models.DateTimeField(auto_now_add = True)
+	dateTime = models.DateTimeField(default = django.utils.timezone.now)
 
 class Occupation(models.Model):
 	def __str__(self):
@@ -72,6 +81,20 @@ class Baby(Person):
 		("Male", "Male"),
 		("Female", "Female"),
 	]
+	def __str__(self):
+		return self.first_name + " " + (self.last_name if self.last_name else "")
+	first_name = models.CharField(max_length = 35)
+	last_name = models.CharField(max_length = 35, blank = True, null = True)
+	date_of_birth = models.DateField()
+	has_sight_difficulties = models.NullBooleanField(blank = True, null = True)
+	has_hearing_difficulties = models.NullBooleanField(blank = True, null = True)
+	father = models.ForeignKey(Father, related_name = 'baby', blank = True, null = True)
+	mother = models.ForeignKey(Mother, related_name = 'baby', blank = True, null = True)
+	sex = models.CharField(max_length = 6, choices = SEX, blank = True, null = True)
+
+class BabyLanguageProfile(DateTimeKeeperModel):
+	def __str__(self):
+		return str(self.baby) + " - " + str(self.dateTime)
 	LANGUAGE_PREVALENCE_ALL_ENGLISH = 1
 	LANGUAGE_PREVALENCE_HALF_ENGLISH_HALF_OTHER_LANGUAGE = 4
 	LANGUAGE_PREVALENCE_ALL_SECOND_LANGUAGE = 7
@@ -84,16 +107,7 @@ class Baby(Person):
 		(6, '6'),
 		(LANGUAGE_PREVALENCE_ALL_SECOND_LANGUAGE, 'All 2nd Language'),
 	)
-	def __str__(self):
-		return self.first_name + " " + (self.last_name if self.last_name else "")
-	first_name = models.CharField(max_length = 35)
-	last_name = models.CharField(max_length = 35, blank = True, null = True)
-	date_of_birth = models.DateField()
-	has_sight_difficulties = models.NullBooleanField(blank = True, null = True)
-	has_hearing_difficulties = models.NullBooleanField(blank = True, null = True)
-	father = models.ForeignKey(Father, related_name = 'baby', blank = True, null = True)
-	mother = models.ForeignKey(Mother, related_name = 'baby', blank = True, null = True)
-	sex = models.CharField(max_length = 6, choices = SEX, blank = True, null = True)
+	baby = models.ForeignKey(Baby, related_name = 'language_profiles')
 	language_spoken_in_home_between_parents = models.IntegerField(choices = CHOICES_LANGUAGE_PREVALENCE, blank = True, null = True)
 	language_spoken_in_home_between_siblings = models.IntegerField(choices = CHOICES_LANGUAGE_PREVALENCE, blank = True, null = True)
 	language_spoken_in_home_between_maternal_grandparents = models.IntegerField(choices = CHOICES_LANGUAGE_PREVALENCE, blank = True, null = True)
@@ -125,7 +139,7 @@ class Baby(Person):
 	language_child_uses_for_watching_tv_or_video = models.IntegerField(choices = CHOICES_LANGUAGE_PREVALENCE, blank = True, null = True)
 	language_child_uses_internet_or_smartphones_in = models.IntegerField(choices = CHOICES_LANGUAGE_PREVALENCE, blank = True, null = True)
 	language_child_uses_overall_to_speak_at_home = models.IntegerField(choices = CHOICES_LANGUAGE_PREVALENCE, blank = True, null = True)
-	language_child_uses_overall_to_speak_within_your_community = models.IntegerField(choices = CHOICES_LANGUAGE_PREVALENCE, blank = True, null = True) 
+	language_child_uses_overall_to_speak_within_your_community = models.IntegerField(choices = CHOICES_LANGUAGE_PREVALENCE, blank = True, null = True)
 
 class LanguageProficiencyOfMothersInSpeaking(models.Model):
 	def __str__(self):
@@ -185,57 +199,57 @@ class LanguageProficiencyOfFathersInReading(models.Model):
 
 class LanguageSpokenToBabyByMother(models.Model):
 	def __str__(self):
-		return str(self.baby) + " - " + str(self.language) + " - " + str(self.percentage)
-	baby = models.ForeignKey(Baby)
+		return str(self.language_profile) + " - " + str(self.language) + " - " + str(self.percentage)
+	language_profile = models.ForeignKey(BabyLanguageProfile, related_name = 'languages_spoken_to_baby_by_mother')
 	language = models.ForeignKey(Language)
 	percentage = PercentField()
 
 class LanguageSpokenToBabyByFather(models.Model):
 	def __str__(self):
-		return str(self.baby) + " - " + str(self.language) + " - " + str(self.percentage)
-	baby = models.ForeignKey(Baby)
+		return str(self.language_profile) + " - " + str(self.language) + " - " + str(self.percentage)
+	language_profile = models.ForeignKey(BabyLanguageProfile, related_name = 'languages_spoken_to_baby_by_father')
 	language = models.ForeignKey(Language)
 	percentage = PercentField()
 
 class LanguageSpokenToBabyBySiblings(models.Model):
 	def __str__(self):
-		return str(self.baby) + " - " + str(self.language) + " - " + str(self.percentage)
-	baby = models.ForeignKey(Baby)
+		return str(self.language_profile) + " - " + str(self.language) + " - " + str(self.percentage)
+	language_profile = models.ForeignKey(BabyLanguageProfile, related_name = 'languages_spoken_to_baby_by_siblings')
 	language = models.ForeignKey(Language)
 	percentage = PercentField()
 
 class LanguageSpokenToBabyByMaternalGrandparents(models.Model):
 	def __str__(self):
-		return str(self.baby) + " - " + str(self.language) + " - " + str(self.percentage)
-	baby = models.ForeignKey(Baby)
+		return str(self.language_profile) + " - " + str(self.language) + " - " + str(self.percentage)
+	language_profile = models.ForeignKey(BabyLanguageProfile, related_name = 'languages_spoken_to_baby_by_maternal_grandparents')
 	language = models.ForeignKey(Language)
 	percentage = PercentField()
 
 class LanguageSpokenToBabyByPaternalGrandparents(models.Model):
 	def __str__(self):
-		return str(self.baby) + " - " + str(self.language) + " - " + str(self.percentage)
-	baby = models.ForeignKey(Baby)
+		return str(self.language_profile) + " - " + str(self.language) + " - " + str(self.percentage)
+	language_profile = models.ForeignKey(BabyLanguageProfile, related_name = 'languages_spoken_to_baby_by_paternal_grandparents')
 	language = models.ForeignKey(Language)
 	percentage = PercentField()
 
 class LanguageSpokenToBabyByRelatives(models.Model):
 	def __str__(self):
-		return str(self.baby) + " - " + str(self.language) + " - " + str(self.percentage)
-	baby = models.ForeignKey(Baby)
+		return str(self.language_profile) + " - " + str(self.language) + " - " + str(self.percentage)
+	language_profile = models.ForeignKey(BabyLanguageProfile, related_name = 'languages_spoken_to_baby_by_relatives')
 	language = models.ForeignKey(Language)
 	percentage = PercentField()
 
 class LanguageSpokenToBabyByOtherCaregivers(models.Model):
 	def __str__(self):
-		return str(self.baby) + " - " + str(self.language) + " - " + str(self.percentage)
-	baby = models.ForeignKey(Baby)
+		return str(self.language_profile) + " - " + str(self.language) + " - " + str(self.percentage)
+	language_profile = models.ForeignKey(BabyLanguageProfile, related_name = 'languages_spoken_to_baby_by_other_caregivers')
 	language = models.ForeignKey(Language)
 	percentage = PercentField()
 
 class LanguageSpokenToBabyInSchool(models.Model):
 	def __str__(self):
-		return str(self.baby) + " - " + str(self.language) + " - " + str(self.percentage)
-	baby = models.ForeignKey(Baby)
+		return str(self.language_profile) + " - " + str(self.language) + " - " + str(self.percentage)
+	language_profile = models.ForeignKey(BabyLanguageProfile, related_name = 'languages_spoken_to_baby_in_school')
 	language = models.ForeignKey(Language)
 	percentage = PercentField()
 

@@ -2,10 +2,10 @@ from django.contrib import admin
 from .models import Language, Mother, Father, Baby, LanguagesKnownByFatherInOrderOfFluency, LanguagesKnownByMotherInOrderOfFluency, \
 LanguageProficiencyOfMothersInSpeaking, LanguageProficiencyOfMothersInUnderstanding, LanguageProficiencyOfMothersInWriting,\
 LanguageProficiencyOfMothersInReading, LanguageProficiencyOfFathersInSpeaking, LanguageProficiencyOfFathersInUnderstanding,\
-LanguageProficiencyOfFathersInWriting, LanguageProficiencyOfFathersInReading, LanguageSpokenToBabyByMother,\
-LanguageSpokenToBabyByFather, LanguageSpokenToBabyBySiblings, LanguageSpokenToBabyByMaternalGrandparents,\
-LanguageSpokenToBabyByPaternalGrandparents, LanguageSpokenToBabyByRelatives, LanguageSpokenToBabyByOtherCaregivers,\
-LanguageSpokenToBabyInSchool, Session, Study, Occupation
+LanguageProficiencyOfFathersInWriting, LanguageProficiencyOfFathersInReading, Session, Study, Occupation, BabyLanguageProfile, \
+LanguageSpokenToBabyByMother, LanguageSpokenToBabyByFather, LanguageSpokenToBabyBySiblings, LanguageSpokenToBabyByMaternalGrandparents, \
+LanguageSpokenToBabyByPaternalGrandparents, LanguageSpokenToBabyByRelatives, LanguageSpokenToBabyByOtherCaregivers, LanguageSpokenToBabyInSchool
+import nested_admin
 
 admin.site.register(Language)
 admin.site.register(Session)
@@ -80,47 +80,48 @@ class MotherAdmin(admin.ModelAdmin):
 		LanguageProficiencyOfMothersInReadingInline,
 	]
 
-class LanguageSpokenToBabyByMotherInline(admin.TabularInline):
-	def get_extra(self, request, obj, **kwargs):
-		return 0
+class LanguageSpokenToBabyByMotherInline(nested_admin.NestedStackedInline):
 	model = LanguageSpokenToBabyByMother
-
-class LanguageSpokenToBabyByFatherInline(admin.TabularInline):
 	def get_extra(self, request, obj, **kwargs):
 		return 0
+
+class LanguageSpokenToBabyByFatherInline(nested_admin.NestedStackedInline):
 	model = LanguageSpokenToBabyByFather
-
-class LanguageSpokenToBabyBySiblingsInline(admin.TabularInline):
 	def get_extra(self, request, obj, **kwargs):
 		return 0
+
+class LanguageSpokenToBabyBySiblingsInline(nested_admin.NestedStackedInline):
 	model = LanguageSpokenToBabyBySiblings
-
-class LanguageSpokenToBabyByMaternalGrandparentsInline(admin.TabularInline):
 	def get_extra(self, request, obj, **kwargs):
 		return 0
+
+class LanguageSpokenToBabyByMaternalGrandparentsInline(nested_admin.NestedStackedInline):
 	model = LanguageSpokenToBabyByMaternalGrandparents
-
-class LanguageSpokenToBabyByPaternalGrandparentsInline(admin.TabularInline):
 	def get_extra(self, request, obj, **kwargs):
 		return 0
+
+class LanguageSpokenToBabyByPaternalGrandparentsInline(nested_admin.NestedStackedInline):
 	model = LanguageSpokenToBabyByPaternalGrandparents
-
-class LanguageSpokenToBabyByRelativesInline(admin.TabularInline):
 	def get_extra(self, request, obj, **kwargs):
 		return 0
+
+class LanguageSpokenToBabyByRelativesInline(nested_admin.NestedStackedInline):
 	model = LanguageSpokenToBabyByRelatives
-
-class LanguageSpokenToBabyByOtherCaregiversInline(admin.TabularInline):
 	def get_extra(self, request, obj, **kwargs):
 		return 0
+
+class LanguageSpokenToBabyByOtherCaregiversInline(nested_admin.NestedStackedInline):
 	model = LanguageSpokenToBabyByOtherCaregivers
-
-class LanguageSpokenToBabyInSchoolInline(admin.TabularInline):
 	def get_extra(self, request, obj, **kwargs):
 		return 0
-	model = LanguageSpokenToBabyInSchool
 
-class BabyAdmin(admin.ModelAdmin):
+class LanguageSpokenToBabyInSchoolInline(nested_admin.NestedStackedInline):
+	model = LanguageSpokenToBabyInSchool
+	def get_extra(self, request, obj, **kwargs):
+		return 0
+
+class BabyLanguageProfileInline(nested_admin.NestedStackedInline):
+	model = BabyLanguageProfile
 	inlines = [
 		LanguageSpokenToBabyByMotherInline,
 		LanguageSpokenToBabyByFatherInline,
@@ -131,7 +132,29 @@ class BabyAdmin(admin.ModelAdmin):
 		LanguageSpokenToBabyByOtherCaregiversInline,
 		LanguageSpokenToBabyInSchoolInline,
 	]
+	def get_extra(self, request, obj, **kwargs):
+		return 0
+	readonly_fields = ('last_modified', 'created_at', )
 
+class BabyAdmin(nested_admin.NestedModelAdmin):
+	inlines = [
+		BabyLanguageProfileInline,
+	]
+
+class BabyLanguageProfileAdmin(nested_admin.NestedModelAdmin):
+	inlines = [
+		LanguageSpokenToBabyByMotherInline,
+		LanguageSpokenToBabyByFatherInline,
+		LanguageSpokenToBabyBySiblingsInline,
+		LanguageSpokenToBabyByMaternalGrandparentsInline,
+		LanguageSpokenToBabyByPaternalGrandparentsInline,
+		LanguageSpokenToBabyByRelativesInline,
+		LanguageSpokenToBabyByOtherCaregiversInline,
+		LanguageSpokenToBabyInSchoolInline,
+	]
+	readonly_fields = ('last_modified', 'created_at', )
+
+admin.site.register(BabyLanguageProfile, BabyLanguageProfileAdmin)
 admin.site.register(Father, FatherAdmin)
 admin.site.register(Mother, MotherAdmin)
 admin.site.register(Baby, BabyAdmin)
