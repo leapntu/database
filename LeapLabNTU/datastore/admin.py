@@ -140,6 +140,7 @@ class BabyAdmin(nested_admin.NestedModelAdmin):
 	inlines = [
 		BabyLanguageProfileInline,
 	]
+	readonly_fields = ('slug', )
 
 class BabyLanguageProfileAdmin(nested_admin.NestedModelAdmin):
 	inlines = [

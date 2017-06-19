@@ -3,8 +3,20 @@ from django_countries.fields import CountryField
 from phonenumber_field.modelfields import PhoneNumberField
 from address.models import AddressField
 from django.core.validators import MinValueValidator, MaxValueValidator
-import datetime
 import django
+from django.utils.crypto import get_random_string
+
+def slug_save(obj):
+	if not obj.slug:
+		obj.slug = get_random_string(8)
+		slug_is_wrong = True
+		while slug_is_wrong:
+			slug_is_wrong = False
+			other_objs_with_slug = type(obj).objects.filter(slug = obj.slug)
+			if len(other_objs_with_slug) > 0:
+				slug_is_wrong = True
+			if slug_is_wrong:
+				obj.slug = get_random_string(8)
 
 class PercentField(models.FloatField):
     """
@@ -91,6 +103,10 @@ class Baby(Person):
 	father = models.ForeignKey(Father, related_name = 'baby', blank = True, null = True)
 	mother = models.ForeignKey(Mother, related_name = 'baby', blank = True, null = True)
 	sex = models.CharField(max_length = 6, choices = SEX, blank = True, null = True)
+	slug = models.SlugField(max_length = 8, blank = True)
+	def save(self, *args, **kwargs):
+		slug_save(self)
+		super().save(*args, **kwargs)
 
 class BabyLanguageProfile(DateTimeKeeperModel):
 	def __str__(self):
