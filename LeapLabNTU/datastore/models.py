@@ -38,7 +38,7 @@ class Mother(Parent):
 		if not babies.count():
 			return 'Mother without any assigned baby'
 		else:
-			return "Mother of " + babies[0].first_name + " " + babies[0].last_name
+			return "Mother of " + babies[0].first_name + (" " + babies[0].last_name if babies[0].last_name else "")
 
 class Father(Parent):
 	def __str__(self):
@@ -46,7 +46,7 @@ class Father(Parent):
 		if not babies.count():
 			return 'Father without any assigned baby'
 		else:
-			return "Father of " + babies[0].first_name + " " + babies[0].last_name
+			return "Father of " + babies[0].first_name + (" " + babies[0].last_name if babies[0].last_name else "")
 
 class LanguagesKnownByFatherInOrderOfFluency(models.Model):
 	def __str__(self):
