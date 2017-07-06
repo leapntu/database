@@ -64,7 +64,7 @@ class LanguageProficiencyOfFathersInReadingInline(nested_admin.NestedStackedInli
 		return 0
 	model = LanguageProficiencyOfFathersInReading
 
-class FatherAdmin(admin.ModelAdmin):
+class FatherAdmin(nested_admin.NestedModelAdmin):
 	inlines = [
 		LanguagesKnownByFatherInOrderOfFluencyInline,
 		LanguageProficiencyOfFathersInSpeakingInline,
@@ -73,7 +73,7 @@ class FatherAdmin(admin.ModelAdmin):
 		LanguageProficiencyOfFathersInReadingInline,
 	]
 
-class MotherAdmin(admin.ModelAdmin):
+class MotherAdmin(nested_admin.NestedModelAdmin):
 	inlines = [
 		LanguagesKnownByMotherInOrderOfFluencyInline,
 		LanguageProficiencyOfMothersInSpeakingInline,
